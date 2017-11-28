@@ -1,0 +1,24 @@
+
+# Create/Delete WRED entries
+- name: "Configure QOS WRED entries"
+  opx_generic_cps:
+    module_name: "base-qos/wred-profile"
+    attr_data: "{{ outer_item.qos_wred_attr_data }}"
+    operation: "{{ outer_item.operation }}"
+  environment:
+      PYTHONPATH: /usr/lib/opx:/usr/lib/x86_64-linux-gnu/opx
+      LD_LIBRARY_PATH: /usr/lib/opx:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib:/lib
+  when:
+    - outer_item.qos_wred_attr_data is defined and outer_item.qos_wred_attr_data
+  become: true
+  register: opx
+
+
+# If operation=create, retrieve generated wred_id from the registered variable (opx)
+# This id will be added to the QOS queues
+- name: "Set wred ID"
+  set_fact: 
+    wred_id: "{{ opx['response_id'] }}"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "create"
+    - outer_item.qos_wred_attr_data is defined and outer_item.qos_wred_attr_data

@@ -1,0 +1,23 @@
+
+# Create/Delete Scheduler entries
+- name: "Configure QOS Scheduler entries"
+  opx_generic_cps:
+    module_name: "base-qos/scheduler-profile"
+    attr_data: "{{ outer_item.qos_scheduler }}"
+    operation: "{{ outer_item.operation }}"
+  environment:
+      PYTHONPATH: /usr/lib/opx:/usr/lib/x86_64-linux-gnu/opx
+      LD_LIBRARY_PATH: /usr/lib/opx:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib:/lib
+  when:
+    - outer_item.qos_scheduler is defined and outer_item.qos_scheduler
+  become: true
+  register: opx
+
+
+# Set scheduler ID
+- name: "Set scheduler ID"
+  set_fact: 
+    scheduler_id: "{{ opx['response_id'] }}"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "create"
+    - outer_item.qos_scheduler is defined and outer_item.qos_scheduler

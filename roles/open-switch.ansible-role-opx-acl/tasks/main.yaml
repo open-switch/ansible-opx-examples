@@ -1,0 +1,8 @@
+
+# Loop in with the list of elements in opx_acl
+- include_tasks: "acl.yaml"
+  with_items: "{{ opx_acl }}"
+  when: opx_acl is defined and opx_acl
+  loop_control:
+    loop_var: outer_item
+

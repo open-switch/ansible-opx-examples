@@ -1,0 +1,3 @@
+opx ansible_host=10.16.204.56 ansible_net_os_name="openswitch" ansible_ssh_user="root" ansible_ssh_pass="force10"
+[datacenter]
+opx

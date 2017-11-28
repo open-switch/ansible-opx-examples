@@ -1,0 +1,175 @@
+
+# Sample variables for OPX device
+
+# This section is for lldp configurations. 
+#lldpcli commands are derived based on the configurations and put into /etc/lldpd.conf
+opx_lldp: 
+    tx-interval: 30
+    tx-hold: 2
+    fast-start-enable: true
+    fast-start-tx-interval: 2
+
+# This section is for static updation of routing table for IPv4 addresses
+# multiple nexthop can be configured for ECMP support
+# interface must be present and ip configured
+opx_route_v4: 
+    - ip_and_mask: 10.18.0.0/24 
+      interface: eth0
+      state: present
+    - ip_and_mask: 10.18.0.0/24 
+      interface: eth0
+      state: absent
+
+# This section is for static updation of routing table for IPv6 addresses
+opx_route_v6: 
+    - ipv6_and_mask: 0::0/0
+      interface: eth0
+      state: present
+    - ipv6_and_mask: 0::0/0
+      state: absent
+
+# This section is for static updation of ARP table for IPv4 addresses
+opx_arp: 
+    - ipv4_address: 10.16.204.2
+      mac_address: 00:0c:29:c0:94:bb
+      state: present
+    - ipv4_address: 10.16.204.2
+      state: absent
+
+# This section is for static updation of neighbor table for IPv6 addresses
+opx_neigh:
+    - ipv6_address: fec0::3
+      mac_address: 02:01:02:03:04:03
+      interface: eth0
+      state: present
+    - ipv6_address: fec0::3
+      interface: eth0
+      state: absent
+
+# This section is to enable/disable STP on a bridge
+# bridge must be present
+opx_stp:
+    - bridge: br100
+      state: present
+    - bridge: br100
+      state: absent
+
+# MAC configuration - using CPS
+
+opx_mac:
+  - operation: create
+    mac_attr_type:
+      base-mac/table/mac-address: "mac" 
+    mac_attr_data: 
+      mac-address: "aa:0a:0b:cc:0d:0e"
+      ifindex: 18
+      vlan: "1"
+  - operation: delete
+    mac_attr_type:
+      base-mac/table/mac-address: "mac" 
+    mac_attr_data: 
+      mac-address: "aa:0a:0b:cc:0d:0e"
+      ifindex: 18
+      vlan: "1"
+
+# ACL configuration - using CPS
+# opx_acl
+#    operation - optional - create, delete; default=create
+#    acl_tbl_attr_data - optional - dict - ACL table attributes
+#    acl_entries - optional - list of ACL entries
+#
+# acl_tbl_attr_data and acl_entries[x] must contain all the attributes as dict required for creation/deletion of CPS object.
+#    If operation=delete, id must be provided in the vars
+#
+# acl_tbl_attr_data and acl_entries are optional parameters but either one or both can be provided at a time
+#    If both are present and operation=create, first ACL table will be created and then entries will be created for that table.
+#    If both are present and operation=delete, first all ACL entries will be deleted and then the table will be deleted.
+#    If only acl_tbl_attr_data is present, ACL will be created/deleted based on the operation
+#    If only acl_entries are present, ACL will be created/deleted based on the operation
+
+opx_acl:
+  - operation: create
+    acl_tbl_attr_data:
+      name: l2_mac
+      stage: 1
+      priority: 104
+      allowed-match-fields: [3, 6, 9, 21]
+    acl_entries:
+      - name: l2_mac_entry1
+        priority: 512
+        match,0,type: 3
+        match,0,SRC_MAC_VALUE,addr: '50:10:6e:00:00:00'
+
+# QOS configuration - using CPS
+# opx_qos - List of QOS operation
+#    operation - create, ,set, delete; default=create
+#    qos_queue_set_data - dict - QOS Queue Set attributes
+#    qos_queue_unset_data -  dict - QOS Queue Unset attributes
+#    qos_wred_attr_data - dict - QOS WRED attributes
+#    qos_scheduler - dict - QOS scheduler attributes
+#    qos_dscp_map_id - dict - QOS DSCP MAP attributes
+#    qos_dscp_map_entry - dict - QOS DSCP MAP entry attributes
+#    qos_tc_map_id - dict - QOS TC MAP attributes
+#    qos_tc_map_entry - dict - QOS TC MAP entry attributes
+#    qos_policer_meter - dict - QOS meter attributes
+#    qos_ing_port - dict - QOS ingress port attributes
+#    qos_egr_port - dict - QOS egress port attributes
+#
+
+opx_qos:
+  - operation: create
+    qos_wred_attr_data:
+      green-enable: 1
+      green-min-threshold: 10
+      green-max-threshold: 20
+      green-drop-probability: 1
+      yellow-enable: 1
+      yellow-min-threshold: 10
+      yellow-max-threshold: 20
+      yellow-drop-probability: 3
+      weight: 8
+      ecn-enable: 1
+      npu-id-list: [0]      
+    qos_scheduler:
+      name: strict priority
+      algorithm: 1
+      weight: 2
+      meter-type: 1
+      min-rate: 256
+      min-burst: 300
+      max-rate: 1000
+      max-burst: 1200 
+    qos_dscp_map_id:
+      switch-id: 0
+      name: dscp_map
+    qos_dscp_map_entry:
+      base-qos/dscp-to-tc-color-map/entry/tc: 0
+      base-qos/dscp-to-tc-color-map/entry/color: 1
+      base-qos/dscp-to-tc-color-map/entry/dscp: 40
+    qos_tc_map_id:
+      switch-id: 0
+      name: dscp_map
+    qos_tc_map_entry:
+      base-qos/tc-color-to-dscp-map/entry/tc: 0
+      base-qos/tc-color-to-dscp-map/entry/color: 1
+      base-qos/tc-color-to-dscp-map/entry/dscp: 40
+    qos_policer_meter:
+      type: 1
+      peak-rate: 10
+      mode: 4
+  - operation: set
+    qos_queue_set_data:
+      port-id: 17
+      queue-number: 4
+      type: 2
+      buffer-profile-id: 4
+    qos_queue_unset_data:
+      port-id: 17
+      queue-number: 4
+      type: 2
+      buffer-profile-id: 0
+      wred-id: 0
+    qos_ing_port:
+      port-id: 16
+    qos_egr_port:
+      port-id: 17

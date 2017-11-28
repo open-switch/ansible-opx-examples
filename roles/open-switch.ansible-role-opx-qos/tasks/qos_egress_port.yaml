@@ -1,0 +1,18 @@
+# Append generated Map ID and scheduler ID with qos_egr_port dict
+- name: "Append generated Map ID and scheduler ID with qos_egr_port dict"
+  set_fact:
+    attr_data_var: "{{ outer_item.qos_egr_port | combine({'tc-color-to-dscp-map': dscp_tc_color_id}) | combine({'scheduler-profile-id': scheduler_id}) }}"
+
+# Set ingress port values
+- name: "Configure ingress port parameters"
+  opx_generic_cps:
+    module_name: "base-qos/port-egress"
+    attr_data: "{{ attr_data_var }}"
+    operation: "{{ outer_item.operation }}"
+  environment:
+      PYTHONPATH: /usr/lib/opx:/usr/lib/x86_64-linux-gnu/opx
+      LD_LIBRARY_PATH: /usr/lib/opx:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib:/lib
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "set"
+    - outer_item.qos_egr_port is defined and outer_item.qos_egr_port
+  become: true

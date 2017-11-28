@@ -1,0 +1,6 @@
+
+- include_tasks: "qos.yaml"
+  with_items: "{{ opx_qos }}"
+  when: opx_qos is defined and opx_qos
+  loop_control:
+    loop_var: outer_item

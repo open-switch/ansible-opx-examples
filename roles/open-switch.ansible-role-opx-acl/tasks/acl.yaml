@@ -1,0 +1,28 @@
+
+# If operation=create, create table first and retrieve the generated table-id to be used to create entries
+- include_tasks: "acl_table.yaml"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "create"
+    - outer_item.acl_tbl_attr_data is defined and outer_item.acl_tbl_attr_data
+
+# If operation=delete, set table-id by reading from vars (hard-coded)
+- name: Set Table ID
+  set_fact: 
+    tbl_id: "{{ outer_item.acl_tbl_attr_data.id }}"
+  when:
+    - outer_item.operation is defined and outer_item.operation == "delete"
+    - outer_item.acl_tbl_attr_data is defined and outer_item.acl_tbl_attr_data
+    - outer_item.acl_entries is defined and outer_item.acl_entries
+
+# Create/delete list of ACL entries
+- include_tasks: "acl_entry.yaml"
+  with_items: "{{ outer_item.acl_entries }}"
+  when:
+    - outer_item.acl_entries is defined and outer_item.acl_entries
+
+# If operation=delete, delete the table at the end  
+- include_tasks: "acl_table.yaml"
+  when:
+    - outer_item.operation is defined and outer_item.operation == "delete"
+    - outer_item.acl_tbl_attr_data is defined and outer_item.acl_tbl_attr_data
+

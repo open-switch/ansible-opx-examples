@@ -1,0 +1,14 @@
+
+- name: Add new ip v6 route
+  command: "ip -6 route add {{ item.ipv6_and_mask }}  dev {{ item.interface }}"
+  when: 
+    - item.state is undefined or item.state != "absent"
+    - item.ipv6_and_mask
+    - item.interface
+
+- name: Delete ip v6 route
+  command: "ip -6 route del {{ item.ipv6_and_mask }}"
+  when:
+    - item.state is defined and item.state == "absent"
+    - item.ipv6_and_mask 
+

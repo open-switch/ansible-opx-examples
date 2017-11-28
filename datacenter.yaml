@@ -1,0 +1,8 @@
+---
+- hosts: datacenter
+  roles:
+    - open-switch.ansible-role-opx-system
+    - open-switch.ansible-role-opx-acl
+    - open-switch.ansible-role-opx-mac
+    - open-switch.ansible-role-opx-qos
+    

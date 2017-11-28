@@ -1,0 +1,22 @@
+
+# Create/Delete ACL table
+- name: Configure ACL table
+  opx_generic_cps:
+    module_name: "base-acl/table"
+    attr_data: "{{ outer_item.acl_tbl_attr_data }}"
+    operation: "{{ outer_item.operation}}"
+  environment:
+      PYTHONPATH: "/usr/lib/opx:/usr/lib/x86_64-linux-gnu/opx"
+      LD_LIBRARY_PATH: "/usr/lib/opx:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib:/lib"
+  become: true
+  register: opx
+
+# If operation=create, retrieve generated table-id from the registered variable (opx)
+# This will be used for creation of ACL entries
+- name: Set Table ID
+  set_fact: 
+    tbl_id: "{{ opx['response_id'] }}"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "create"
+    - outer_item.acl_entries is defined and outer_item.acl_entries
+

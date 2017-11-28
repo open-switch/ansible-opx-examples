@@ -1,0 +1,34 @@
+#jinja2: trim_blocks: True,lstrip_blocks: True
+{#####################################################
+
+Purpose:
+Configure lldpcli - provide all commands supported by lldpcli
+
+opx_lldp:
+    tx-interval: 20
+    tx-hold: 2
+    fast-start-enable: false
+    fast-start-tx-interval: 2
+
+#####################################################}
+{% if opx_lldp is defined and opx_lldp %}
+  {% for key in opx_lldp.keys() %}
+    {% set value = opx_lldp[key] %}
+    {% if key == "tx-interval" and value %}
+configure lldp tx-interval {{ value }}
+    {% endif %}
+    {% if key == "tx-hold" and value %}
+configure lldp tx-hold {{ value }}
+    {% endif %}
+    {% if key == "fast-start-enable" %}
+      {% if value == True %}
+configure med fast-start enable
+      {% elif value == False %}
+unconfigure med fast-start
+      {% endif %}
+    {% endif %}
+    {% if key == "fast-start-tx-interval" and value %}
+configure med fast-start tx-interval {{ value }}
+    {% endif %}
+  {% endfor %}
+{% endif %}

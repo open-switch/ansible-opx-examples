@@ -1,0 +1,43 @@
+#
+# opx_acl - List of ACL operation
+#    operation - optional - create, delete; default=create
+#    acl_tbl_attr_data - optional - dict - ACL table attributes
+#    acl_entries - optional - list of ACL entries
+#
+# acl_tbl_attr_data and acl_entries[x] must contain all the attributes as dict required for creation/deletion of CPS object.
+#    If operation=delete, id must be provided in the vars
+#
+# acl_tbl_attr_data and acl_entries are optional parameters but either one or both can be provided at a time
+#    If both are present and operation=create, first ACL table will be created and then entries will be created for that table.
+#    If both are present and operation=delete, first all ACL entries will be deleted and then the table will be deleted.
+#    If only acl_tbl_attr_data is present, ACL will be created/deleted based on the operation
+#    If only acl_entries are present, ACL will be created/deleted based on the operation
+
+opx_acl:
+  - operation: delete
+    acl_tbl_attr_data:
+      name: l2_mac
+      id: 79
+    acl_entries:
+      - name: l2_mac_entry1
+        id: 1
+#        table-id : 76
+  - operation: create
+    acl_tbl_attr_data:
+      name: l2_mac
+      stage: 1
+      priority: 102
+      allowed-match-fields: [3, 6, 9, 21]
+    acl_entries:
+      - name: l2_mac_entry1
+#        table-id : 68
+        priority: 512
+        match,0,type: 3
+        match,0,SRC_MAC_VALUE,addr: '50:10:6e:00:00:00'
+  - operation: delete
+    acl_entries:
+      - name: l2_mac_entry2
+        table-id : 35
+        id: 45
+
+

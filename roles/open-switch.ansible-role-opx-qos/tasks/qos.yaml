@@ -1,0 +1,53 @@
+
+# Create QOS wred entries
+- include_tasks: "qos_wred.yaml"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "create"
+    - outer_item.qos_wred_attr_data is defined and outer_item.qos_wred_attr_data
+
+# If operation=set, create wred profile first and retrieve the generated wred-id to be used in queue
+- include_tasks: "qos_queues.yaml"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "set"
+
+# Create DSCP TC color map
+- include_tasks: "qos_dscp_tc_color_map.yaml"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "create"
+    - outer_item.qos_dscp_map_id is defined and outer_item.qos_dscp_map_id
+
+# Create TC color DSCP map
+- include_tasks: "qos_tc_color_dscp_map.yaml"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "create"
+    - outer_item.qos_tc_map_id is defined and outer_item.qos_tc_map_id
+
+# Create Meter
+- include_tasks: "qos_meter.yaml"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "create"
+    - outer_item.qos_policer_meter is defined and outer_item.qos_policer_meter
+
+# Create Scheduler profile
+- include_tasks: "qos_scheduler.yaml"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "create"
+    - outer_item.qos_scheduler is defined and outer_item.qos_scheduler
+
+#Set DSCP map, meter to ingress port
+- include_tasks: "qos_ingress_port.yaml"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "set"
+    - outer_item.qos_ing_port is defined and outer_item.qos_ing_port
+
+#Set scheduler prifile TC map to egress port
+- include_tasks: "qos_egress_port.yaml"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "set"
+    - outer_item.qos_egr_port is defined and outer_item.qos_egr_port
+
+# delete QOS wred entries
+- include_tasks: "qos_wred.yaml"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "delete"
+    - outer_item.qos_wred_attr_data is defined and outer_item.qos_wred_attr_data

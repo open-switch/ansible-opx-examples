@@ -1,0 +1,14 @@
+
+- name: Add new arp entry
+  command: "arp -s {{ item.ipv4_address }} {{ item.mac_address }}"
+  when: 
+    - item.state is undefined or item.state != "absent"
+    - item.ipv4_address
+    - item.mac_address
+
+- name: Delete an arp entry
+  command: "arp -d {{ item.ipv4_address }}"
+  when:
+    - item.state is defined and item.state == "absent"
+    - item.ipv4_address 
+

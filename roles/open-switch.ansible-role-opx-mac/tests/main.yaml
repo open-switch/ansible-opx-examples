@@ -1,0 +1,16 @@
+
+opx_mac:
+  - operation: create
+    mac_attr_type:
+      base-mac/table/mac-address: "mac" 
+    mac_attr_data: 
+      mac-address: "aa:0a:0b:cc:0d:0e"
+      ifindex: 18
+      vlan: "1"
+  - operation: delete
+    mac_attr_type:
+      base-mac/table/mac-address: "mac" 
+    mac_attr_data: 
+      mac-address: "aa:0a:0b:cc:0d:0e"
+      ifindex: 18
+      vlan: "1"

@@ -1,0 +1,18 @@
+# Append generated map Id and policer Id with qos_ing_port dict
+- name: "Append generated map Id and policer Id with qos_ing_port dict"
+  set_fact:
+    attr_data_var: "{{ outer_item.qos_ing_port | combine({'dscp-to-tc-color-map': dscp_tc_color_id}) | combine({'flood_storm_control': meter_id}) }}"
+
+# Set ingress port parameters
+- name: "Configure ingress port parameters"
+  opx_generic_cps:
+    module_name: "base-qos/port-ingress"
+    attr_data: "{{ attr_data_var }}"
+    operation: "{{ outer_item.operation }}"
+  environment:
+      PYTHONPATH: /usr/lib/opx:/usr/lib/x86_64-linux-gnu/opx
+      LD_LIBRARY_PATH: /usr/lib/opx:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib:/lib
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "set"
+    - outer_item.qos_ing_port is defined and outer_item.qos_ing_port
+  become: true

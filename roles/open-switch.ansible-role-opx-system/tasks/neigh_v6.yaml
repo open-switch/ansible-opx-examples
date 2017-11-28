@@ -1,0 +1,16 @@
+
+- name: Add an entry to neighbor table 
+  command: "ip -6 neigh add {{ item.ipv6_address }} lladdr {{ item.mac_address }} dev {{ item.interface }}"
+  when:
+    - item.state is undefined or item.state != "absent"
+    - item.ipv6_address
+    - item.mac_address
+    - item.interface 
+
+- name: Delete an entry from neighbor table
+  command: "ip -6 neigh del {{ item.ipv6_address }} dev {{ item.interface }}"
+  when:
+    - item.state is defined and item.state == "absent"
+    - item.ipv6_address
+    - item.interface 
+

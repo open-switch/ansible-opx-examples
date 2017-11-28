@@ -1,0 +1,20 @@
+
+- name: Copy the lldp configuration file to remote end
+  template: src=lldpd_config.j2 dest=/etc/lldpd.conf
+  become: true
+  notify:
+  -  restart lldpd
+
+- meta: flush_handlers
+
+- name: Verify the lldpd service is running
+  service:
+    name: lldpd
+    state: started
+
+- name: Show lldpcli configurations
+  command: "lldpcli show configuration"
+
+- name: Show lldpcli neighbors 
+  command: "lldpcli show neighbors"
+

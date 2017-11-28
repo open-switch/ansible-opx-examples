@@ -1,0 +1,51 @@
+
+
+#include tasks only if lldp configurations are enabled 
+- include_tasks: "lldp.yaml"
+  when: opx_lldp is defined and opx_lldp
+
+#include tasks only if ipv4 unicast routing configurations are provided
+- include_tasks: "unicast_route_v4.yaml"
+  with_items: "{{ opx_route_v4 }}"
+  when: opx_route_v4 is defined and opx_route_v4
+  loop_control:
+    loop_var: outer_item
+
+- name: Show IPv4 route entries
+  command: "ip route show"
+  when: opx_route_v4 is defined and opx_route_v4
+
+#include tasks only if ipv6 unicast routing configurations are provided
+- include_tasks: "unicast_route_v6.yaml"
+  with_items: "{{ opx_route_v6 }}"
+  when: opx_route_v6 is defined and opx_route_v6
+
+- name: Show IPv6 route entries
+  command: "ip -6 route show"
+  when: opx_route_v6 is defined and opx_route_v6
+
+#include tasks only if arp configurations are enabled 
+- include_tasks: "arp_v4.yaml"
+  with_items: "{{ opx_arp }}"
+  when: opx_arp is defined and opx_arp
+
+- name: Show ARP entries
+  command: "arp -n"
+  when: opx_arp is defined and opx_arp
+
+#include tasks only if ip neighbor configurations are enabled 
+- include_tasks: "neigh_v6.yaml"
+  with_items: "{{ opx_neigh }}"
+  when: opx_neigh is defined and opx_neigh
+
+- name: Display neighbor table entries
+  command: "ip -6 neighbor"
+  when: opx_neigh is defined and opx_neigh
+
+#include tasks only if STP configurations are enabled 
+- include_tasks: "stp.yaml"
+  with_items: "{{ opx_stp }}"
+  when: opx_stp is defined and opx_stp
+  loop_control:
+    loop_var: outer_item
+

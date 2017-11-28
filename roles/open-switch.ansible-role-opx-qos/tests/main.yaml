@@ -1,0 +1,76 @@
+#
+# opx_qos - List of QOS operation
+#    operation - create, ,set, delete; default=create
+#    qos_queue_set_data - dict - QOS Queue Set attributes
+#    qos_queue_unset_data -  dict - QOS Queue Unset attributes
+#    qos_wred_attr_data - dict - QOS WRED attributes
+#    qos_scheduler - dict - QOS scheduler attributes
+#    qos_dscp_map_id - dict - QOS DSCP MAP attributes
+#    qos_dscp_map_entry - dict - QOS DSCP MAP entry attributes
+#    qos_tc_map_id - dict - QOS TC MAP attributes
+#    qos_tc_map_entry - dict - QOS TC MAP entry attributes
+#    qos_policer_meter - dict - QOS meter attributes
+#    qos_ing_port - dict - QOS ingress port attributes
+#    qos_egr_port - dict - QOS egress port attributes
+#
+
+opx_qos:
+  - operation: create
+    qos_wred_attr_data:
+      green-enable: 1
+      green-min-threshold: 10
+      green-max-threshold: 20
+      green-drop-probability: 1
+      yellow-enable: 1
+      yellow-min-threshold: 10
+      yellow-max-threshold: 20
+      yellow-drop-probability: 3
+      weight: 8
+      ecn-enable: 1
+      npu-id-list: [0]      
+    qos_scheduler:
+      name: strict priority
+      algorithm: 1
+      weight: 2
+      meter-type: 1
+      min-rate: 256
+      min-burst: 300
+      max-rate: 1000
+      max-burst: 1200 
+    qos_dscp_map_id:
+      switch-id: 0
+      name: dscp_map
+    qos_dscp_map_entry:
+      base-qos/dscp-to-tc-color-map/entry/tc: 0
+      base-qos/dscp-to-tc-color-map/entry/color: 1
+      base-qos/dscp-to-tc-color-map/entry/dscp: 40
+    qos_tc_map_id:
+      switch-id: 0
+      name: dscp_map
+    qos_tc_map_entry:
+      base-qos/tc-color-to-dscp-map/entry/tc: 0
+      base-qos/tc-color-to-dscp-map/entry/color: 1
+      base-qos/tc-color-to-dscp-map/entry/dscp: 40
+    qos_policer_meter:
+      type: 1
+      peak-rate: 10
+      mode: 4
+  - operation: set
+    qos_queue_set_data:
+      port-id: 17
+      queue-number: 4
+      type: 2
+      buffer-profile-id: 4
+    qos_queue_unset_data:
+      port-id: 17
+      queue-number: 4
+      type: 2
+      buffer-profile-id: 0
+      wred-id: 0
+    qos_ing_port:
+      port-id: 16
+    qos_egr_port:
+      port-id: 17
+  - operation: delete  
+    qos_wred_attr_data:
+      id: 95

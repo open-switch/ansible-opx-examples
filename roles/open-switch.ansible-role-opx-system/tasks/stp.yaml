@@ -1,0 +1,19 @@
+
+- name: Enable STP on a bridge and view configuration
+  command: "{{ item }}"
+  with_items:
+    - "brctl stp {{ outer_item.bridge }} on"
+    - "brctl showstp {{ outer_item.bridge }}" 
+  when: 
+    - outer_item.state is undefined or outer_item.state != "absent"
+    - outer_item.bridge
+
+- name: Disable STP on a bridge
+  command: "brctl stp {{ outer_item.bridge }} off"
+  when:
+    - outer_item.state is defined and outer_item.state == "absent"
+    - outer_item.bridge
+
+- name: View bridge configuration
+  command: "brctl show {{ outer_item.bridge }}"
+

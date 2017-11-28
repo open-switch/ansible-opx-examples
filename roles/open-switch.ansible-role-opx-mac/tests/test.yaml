@@ -1,0 +1,5 @@
+---
+- hosts: datacenter
+  connection: local
+  roles:
+    - { role: open-switch.ansible-role-opx-mac, when: ansible_net_os_name is defined and ansible_net_os_name == "openswitch" }

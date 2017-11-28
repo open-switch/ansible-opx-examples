@@ -1,0 +1,34 @@
+
+- set_fact:
+    nexthop_var: "nexthop via {{ item }} "
+  with_items: "{{ outer_item.nexthop_ip }}"
+  when: outer_item.nexthop_ip is defined and outer_item.nexthop_ip
+  register: output
+
+- set_fact:
+    nexthop_res: '{{ output.results | map(attribute="ansible_facts.nexthop_var") | join( ) }}'
+  when: outer_item.nexthop_ip is defined and outer_item.nexthop_ip
+
+- name: Add new ip v4 route with nexthops
+#  debug:
+#    msg: "ip route add {{ outer_item.ip_and_mask }} {{ nexthop_res }}" 
+  command: "ip route add {{ outer_item.ip_and_mask }} {{ nexthop_res }}" 
+  when: 
+    - outer_item.state is undefined or outer_item.state != "absent"
+    - outer_item.ip_and_mask
+    - outer_item.nexthop_ip is defined and outer_item.nexthop_ip
+
+- name: Add new ip v4 route with interface
+  command: "ip route add {{ outer_item.ip_and_mask }}  dev {{ outer_item.interface }}"
+  when: 
+    - outer_item.state is undefined or outer_item.state != "absent"
+    - outer_item.ip_and_mask
+    - outer_item.interface is defined and outer_item.interface
+    - outer_item.nexthop_ip is undefined or not outer_item.nexthop_ip
+
+- name: Delete ip v4 route
+  command: "ip route delete {{ outer_item.ip_and_mask }}"
+  when: 
+    - outer_item.state is defined and outer_item.state == "absent"
+    - outer_item.ip_and_mask
+

@@ -1,0 +1,24 @@
+
+# Using set_fact, create a dict of attr_data 
+- name: Include table ID in attr_data
+  set_fact:
+    attr_data_var: "{{ item|default({}) }}"
+
+# append generated table-id and its value into the dict
+- name: Include table ID in attr_data
+  set_fact:
+    attr_data_var: "{{ attr_data_var | combine({'table-id': tbl_id}) }}"
+  when: outer_item.acl_tbl_attr_data is defined and outer_item.acl_tbl_attr_data
+
+# Create/Delete ACL entries
+- name: Configure ACL entries
+  opx_generic_cps:
+    module_name: "base-acl/entry" 
+    attr_data: "{{ attr_data_var }}"
+    operation: "{{ outer_item.operation }}" 
+  environment:
+      PYTHONPATH: "/usr/lib/opx:/usr/lib/x86_64-linux-gnu/opx"
+      LD_LIBRARY_PATH: "/usr/lib/opx:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib:/lib"
+  become: true
+
+

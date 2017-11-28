@@ -1,0 +1,33 @@
+
+# Append generated wred-id with qos_queue_set_data dict
+- name: "Append generated wred-id with qos_queue_set_data dict"
+  set_fact:
+    attr_data_var: "{{ outer_item.qos_queue_set_data | combine({'wred-id': wred_id}) }}"
+
+# Set QOS queue parameters
+- name: "Set QOS queue parameters"
+  opx_generic_cps:
+    module_name: "base-qos/queue"
+    attr_data: "{{ attr_data_var }}"
+    operation: "{{ outer_item.operation}}"
+  environment:
+      PYTHONPATH: "/usr/lib/opx:/usr/lib/x86_64-linux-gnu/opx"
+      LD_LIBRARY_PATH: "/usr/lib/opx:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib:/lib"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "set"
+    - outer_item.qos_queue_set_data is defined and outer_item.qos_queue_set_data  
+  become: true
+
+# Unset QOS queue parameters
+- name: "Unset QOS queue parameters"
+  opx_generic_cps:
+    module_name: "base-qos/queue"
+    attr_data: "{{ outer_item.qos_queue_unset_data }}"
+    operation: "{{ outer_item.operation}}"
+  environment:
+      PYTHONPATH: "/usr/lib/opx:/usr/lib/x86_64-linux-gnu/opx"
+      LD_LIBRARY_PATH: "/usr/lib/opx:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib:/lib"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "set"
+    - outer_item.qos_queue_unset_data is defined and outer_item.qos_queue_unset_data
+  become: true

@@ -1,0 +1,16 @@
+
+- name: Configure MAC address table entry 
+  opx_generic_cps:
+    module_name: "base-mac/table" 
+    attr_type: "{{ item.mac_attr_type }}"
+    attr_data: "{{ item.mac_attr_data }}"
+    operation: "{{ item.operation}}"
+  with_items: "{{ opx_mac }}"
+  when: opx_mac is defined and opx_mac
+  environment:
+      PYTHONPATH: "/usr/lib/opx:/usr/lib/x86_64-linux-gnu/opx"
+      LD_LIBRARY_PATH: "/usr/lib/opx:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib:/lib"
+  become: true
+  register: opx
+
+

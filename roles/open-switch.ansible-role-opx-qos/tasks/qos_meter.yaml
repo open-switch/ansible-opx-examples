@@ -1,0 +1,22 @@
+
+# Create/Delete Meter
+- name: "Configure Meter"
+  opx_generic_cps:
+    module_name: "base-qos/meter"
+    attr_data: "{{ outer_item.qos_policer_meter }}"
+    operation: "{{ outer_item.operation }}"
+  environment:
+      PYTHONPATH: /usr/lib/opx:/usr/lib/x86_64-linux-gnu/opx
+      LD_LIBRARY_PATH: /usr/lib/opx:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib:/lib
+  when:
+    - outer_item.qos_policer_meter is defined and outer_item.qos_policer_meter
+  become: true
+  register: opx
+
+# Set meter ID
+- name: "Set meter ID"
+  set_fact: 
+    meter_id: "{{ opx['response_id'] }}"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "create"
+    - outer_item.qos_policer_meter is defined and outer_item.qos_policer_meter

@@ -1,0 +1,41 @@
+
+# Create/Delete DSCP to TC color map ID
+- name: "Configure DSCP MAP ID"
+  opx_generic_cps:
+    module_name: "base-qos/dscp-to-tc-color-map"
+    attr_data: "{{ outer_item.qos_dscp_map_id }}"
+    operation: "{{ outer_item.operation }}"
+  environment:
+      PYTHONPATH: /usr/lib/opx:/usr/lib/x86_64-linux-gnu/opx
+      LD_LIBRARY_PATH: /usr/lib/opx:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib:/lib
+  when:
+    - outer_item.qos_dscp_map_id is defined and outer_item.qos_dscp_map_id
+  become: true
+  register: opx
+
+# Set DSCP to TC color map ID
+- name: "Set DSCP to TC color map ID"
+  set_fact: 
+    dscp_tc_color_id: "{{ opx['response_id'] }}"
+  when:
+    - outer_item.operation is undefined or outer_item.operation == "create"
+    - outer_item.qos_dscp_map_id is defined and outer_item.qos_dscp_map_id
+
+# Append generated map id and its value into the dict
+- name: "Append DSCP to TC color map ID with qos_dscp_map_entry dict"
+  set_fact:
+    attr_data_var: "{{ outer_item.qos_dscp_map_entry | combine({'base-qos/dscp-to-tc-color-map/id': dscp_tc_color_id}) }}"
+
+# Create/Delete DSCP to TC color map entry
+- name: "Configure DSCP to TC color map entry"
+  opx_generic_cps:
+    module_name: "base-qos/dscp-to-tc-color-map/entry"
+    attr_data: "{{ attr_data_var }}"
+    operation: "{{ outer_item.operation }}"
+  environment:
+      PYTHONPATH: /usr/lib/opx:/usr/lib/x86_64-linux-gnu/opx
+      LD_LIBRARY_PATH: /usr/lib/opx:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib:/lib
+  when:
+    - outer_item.qos_dscp_map_entry is defined and outer_item.qos_dscp_map_entry
+  become: true
+    
