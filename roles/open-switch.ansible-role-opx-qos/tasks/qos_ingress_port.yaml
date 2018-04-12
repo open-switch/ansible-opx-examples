@@ -1,7 +1,8 @@
 # Append generated map Id and policer Id with qos_ing_port dict
 - name: "Append generated map Id and policer Id with qos_ing_port dict"
   set_fact:
-    attr_data_var: "{{ outer_item.qos_ing_port | combine({'dscp-to-tc-color-map': dscp_tc_color_id}) | combine({'flood_storm_control': meter_id}) }}"
+    attr_data_var: "{{ outer_item.qos_ing_port | combine({'flood_storm_control': meter_id}) }}"
+#    attr_data_var: "{{ outer_item.qos_ing_port | combine({'dscp-to-tc-color-map': dscp_tc_color_id}) | combine({'flood_storm_control': meter_id}) }}"
 
 # Set ingress port parameters
 - name: "Configure ingress port parameters"

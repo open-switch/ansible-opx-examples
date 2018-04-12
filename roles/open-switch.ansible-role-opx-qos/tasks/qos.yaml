@@ -9,12 +9,14 @@
 - include_tasks: "qos_queues.yaml"
   when:
     - outer_item.operation is undefined or outer_item.operation == "set"
+    - (outer_item.qos_queue_set_data is defined and outer_item.qos_queue_set_data) or
+      (outer_item.qos_queue_unset_data is defined and outer_item.qos_queue_unset_data)
 
 # Create DSCP TC color map
-- include_tasks: "qos_dscp_tc_color_map.yaml"
-  when:
-    - outer_item.operation is undefined or outer_item.operation == "create"
-    - outer_item.qos_dscp_map_id is defined and outer_item.qos_dscp_map_id
+#- include_tasks: "qos_dscp_tc_color_map.yaml"
+#  when:
+#    - outer_item.operation is undefined or outer_item.operation == "create"
+#    - outer_item.qos_dscp_map_id is defined and outer_item.qos_dscp_map_id
 
 # Create TC color DSCP map
 - include_tasks: "qos_tc_color_dscp_map.yaml"
