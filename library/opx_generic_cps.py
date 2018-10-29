@@ -78,6 +78,8 @@ RETURN = """
 from ansible.module_utils.basic import *   # NOQA
 
 import sys
+sys.path.append('/usr/lib/opx')
+
 import cps_object
 import cps
 import cps_utils
